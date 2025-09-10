@@ -1,0 +1,193 @@
+/* Custom styles */
+/* Search Tabs */
+.tab-button {
+    color: #6B7280;
+    background-color: #F3F4F6;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.tab-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button.active {
+    color: white;
+    background-color: #4F46E5;
+}
+
+/* YouTube button styles */
+#youtubeTab:hover {
+    background-color: #FF0000;
+    color: white;
+}
+
+/* Stack Overflow button styles */
+#stackOverflowTab:hover {
+    background-color: #F48024;
+    color: white;
+}
+
+/* GitHub button styles */
+#githubTab:hover {
+    background-color: #24292E;
+    color: white;
+}
+
+/* Search Forms */
+.search-form {
+    display: none;
+    width: 100%;
+}
+
+.search-form.active {
+    display: block;
+}
+
+/* Search Results */
+.search-results {
+    display: none;
+}
+
+.search-results.active {
+    display: block;
+}
+
+/* Search Result Cards */
+.search-result {
+    transition: all 0.3s ease;
+}
+
+.search-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive Google Search */
+.gcse-search {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.gsc-control-cse {
+    padding: 0 !important;
+    border: none !important;
+    background-color: transparent !important;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .search-result {
+        padding: 1rem;
+    }
+}
+
+.similarity-score {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4F46E5;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+
+/* Loading animation */
+.loading-spinner {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #4F46E5;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+/* Responsive search box */
+@media (max-width: 640px) {
+    .search-form input[type="text"] {
+        font-size: 16px; /* Prevents zoom on mobile */
+        padding: 0.875rem;
+    }
+    
+    .tab-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .tab-button svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+/* Smooth transitions */
+.search-result {
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.search-result.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Platform-specific colors */
+.youtube-result {
+    border-left: 4px solid #FF0000;
+}
+
+.stackoverflow-result {
+    border-left: 4px solid #F48024;
+}
+
+.github-result {
+    border-left: 4px solid #24292E;
+}
+
+/* Improved loading animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.toast.success {
+    background-color: #059669;
+}
+
+.toast.error {
+    background-color: #DC2626;
+}
+
+.toast.show {
+    opacity: 1;
+}
