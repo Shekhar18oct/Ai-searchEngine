@@ -21,7 +21,7 @@ Step-by-step instructions to set up the environment, for example:
 ## Usage
 
 Provide instructions on how to run the project and see it visually on localhost:
-.\venv\Scripts\activate; python src/main.py
+1. .\venv\Scripts\activate; python src/main.py
 
 
 Then open your browser and go to:
