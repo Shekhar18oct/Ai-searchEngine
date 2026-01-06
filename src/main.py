@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template # pyright: ignore[reportMissingImports]
 from engine.indexer import Indexer
 from engine.searcher import Searcher
+from engine.research_searcher import ResearchPaperSearcher
 from models.document import Document
 import uuid
 from datetime import datetime
@@ -49,32 +50,25 @@ app = Flask(__name__,
 # Initialize the search engine components
 indexer = Indexer()
 searcher = Searcher(indexer)
+research_searcher = ResearchPaperSearcher()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Sample documents for testing
-sample_docs = [
-    Document(
-        id=str(uuid.uuid4()),
-        title="Introduction to AI",
-        content="Artificial Intelligence (AI) is the simulation of human intelligence by machines. It involves creating systems that can learn, reason, and solve problems.",
-        url="https://example.com/ai-intro",
-        created_at=datetime.now()
-    ),
-    Document(
-        id=str(uuid.uuid4()),
-        title="Machine Learning Basics",
-        content="Machine Learning is a subset of AI that focuses on training models to learn from data. It includes supervised, unsupervised, and reinforcement learning approaches.",
-        url="https://example.com/ml-basics",
-        created_at=datetime.now()
-    ),
-]
-
-# Index sample documents
-for doc in sample_docs:
-    indexer.index_document(doc)
+# Sample documents - commenting out to speed up startup
+# Will be indexed when first added via API
+# sample_docs = [
+#     Document(
+#         id=str(uuid.uuid4()),
+#         title="Introduction to AI",
+#         content="Artificial Intelligence (AI) is the simulation of human intelligence by machines.",
+#         url="https://example.com/ai-intro",
+#         created_at=datetime.now()
+#     ),
+# ]
+# for doc in sample_docs:
+#     indexer.index_document(doc)
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -187,5 +181,49 @@ def get_documents():
     """Get all indexed documents"""
     return jsonify(searcher.get_results())
 
+@app.route('/research/search', methods=['GET'])
+def research_search():
+    """Search for research papers across Google Scholar, ResearchGate, and Wikipedia"""
+    query = request.args.get('q', '')
+    source = request.args.get('source', 'all')  # 'all', 'scholar', 'researchgate', 'wikipedia'
+    max_results = int(request.args.get('max', 10))
+    
+    if not query:
+        return jsonify({"error": "Query parameter 'q' is required"}), 400
+    
+    try:
+        if source == 'all':
+            results = research_searcher.search_all(query, max_results)
+            formatted = research_searcher.format_results_for_display(results)
+            return jsonify({
+                "query": query,
+                "total_results": len(formatted),
+                "results": formatted,
+                "results_by_source": {
+                    "scholar": len(results.get('scholar', [])),
+                    "researchgate": len(results.get('researchgate', [])),
+                    "wikipedia": len(results.get('wikipedia', []))
+                }
+            })
+        elif source == 'scholar':
+            results = research_searcher.search_google_scholar(query, max_results)
+        elif source == 'researchgate':
+            results = research_searcher.search_researchgate(query, max_results)
+        elif source == 'wikipedia':
+            results = research_searcher.search_wikipedia(query, max_results)
+        else:
+            return jsonify({"error": "Invalid source parameter"}), 400
+        
+        return jsonify({
+            "query": query,
+            "source": source,
+            "total_results": len(results),
+            "results": results
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000, debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
