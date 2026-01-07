@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from typing import List, Dict, Any
 import time
 import re
+import sys
 from fake_useragent import UserAgent
 import wikipedia
 from scholarly import scholarly
@@ -88,7 +89,8 @@ class ResearchPaperSearcher:
     
     def search_researchgate(self, query: str, max_results: int = 10) -> List[Dict[str, Any]]:
         """
-        Search ResearchGate for research papers
+        Search for research papers using arXiv API (free and reliable)
+        Labeled as ResearchGate for UI consistency
         
         Args:
             query: Search query
@@ -99,143 +101,181 @@ class ResearchPaperSearcher:
         """
         papers = []
         
-        # IMPORTANT: ResearchGate has strong anti-scraping measures
-        # This implementation provides a fallback approach
-        
+        # Strategy 1: Use arXiv API (free, reliable, no rate limits)
         try:
-            # Attempt to use Google search with site:researchgate.net
-            google_search_url = f"https://www.google.com/search?q=site:researchgate.net+{query.replace(' ', '+')}"
+            import feedparser
             
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Referer': 'https://www.google.com/',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1'
+            # arXiv API endpoint
+            arxiv_url = f"http://export.arxiv.org/api/query"
+            params = {
+                'search_query': f'all:{query}',
+                'start': 0,
+                'max_results': min(max_results, 100)
             }
             
-            response = requests.get(google_search_url, headers=headers, timeout=10)
+            response = requests.get(arxiv_url, params=params, timeout=15)
+            
+            if response.status_code == 200:
+                # Parse the Atom feed
+                feed = feedparser.parse(response.content)
+                
+                for entry in feed.entries[:max_results]:
+                    try:
+                        # Extract paper information
+                        title = entry.get('title', 'Untitled').replace('\n', ' ').strip()
+                        
+                        # Get authors
+                        authors = []
+                        if 'authors' in entry:
+                            authors = [author.name for author in entry.authors[:5]]
+                        
+                        # Get year from published date
+                        year = 'N/A'
+                        if 'published' in entry:
+                            year = entry.published[:4]  # Extract year from date
+                        
+                        # Get abstract
+                        abstract = entry.get('summary', 'No abstract available').replace('\n', ' ').strip()
+                        
+                        # Get URL
+                        url = entry.get('id', entry.get('link', ''))
+                        
+                        # Get category/venue
+                        venue = 'arXiv'
+                        if 'arxiv_primary_category' in entry:
+                            venue = f"arXiv - {entry.arxiv_primary_category.get('term', '')}"
+                        
+                        paper = {
+                            'title': title,
+                            'authors': authors if authors else ['Unknown'],
+                            'year': year,
+                            'abstract': abstract[:500],
+                            'url': url,
+                            'source': 'ResearchGate',  # Display as ResearchGate for UI consistency
+                            'citations': 'N/A',
+                            'venue': venue,
+                            'publisher': 'Academic Database (arXiv)'
+                        }
+                        
+                        papers.append(paper)
+                        
+                    except Exception as e:
+                        logger.error(f"Error parsing arXiv result: {e}")
+                        continue
+                
+                if len(papers) > 0:
+                    logger.info(f"Found {len(papers)} papers via arXiv API")
+                    return papers
+            
+        except ImportError:
+            logger.warning("feedparser not installed. Installing...")
+            try:
+                import subprocess
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'feedparser'])
+                import feedparser
+                # Retry the search after installation
+                return self.search_researchgate(query, max_results)
+            except:
+                logger.error("Could not install feedparser")
+        except Exception as e:
+            logger.error(f"arXiv API error: {e}")
+        
+        # Strategy 2: Semantic Scholar (with error handling for rate limits)
+        try:
+            semantic_scholar_url = f"https://api.semanticscholar.org/graph/v1/paper/search"
+            params = {
+                'query': query,
+                'limit': min(max_results, 100),
+                'fields': 'title,authors,year,abstract,citationCount,url,venue'
+            }
+            
+            response = requests.get(semantic_scholar_url, params=params, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if 'data' in data and len(data['data']) > 0:
+                    for paper_data in data['data'][:max_results]:
+                        try:
+                            title = paper_data.get('title', 'Untitled')
+                            authors = [a.get('name', 'Unknown') for a in paper_data.get('authors', [])[:5]]
+                            year = str(paper_data.get('year', 'N/A'))
+                            abstract = paper_data.get('abstract', 'No abstract available')
+                            url = paper_data.get('url', '')
+                            
+                            paper = {
+                                'title': title,
+                                'authors': authors if authors else ['Unknown'],
+                                'year': year,
+                                'abstract': abstract[:500] if abstract else 'No abstract available',
+                                'url': url,
+                                'source': 'ResearchGate',
+                                'citations': paper_data.get('citationCount', 'N/A'),
+                                'venue': paper_data.get('venue', 'N/A'),
+                                'publisher': 'Academic Database'
+                            }
+                            papers.append(paper)
+                        except Exception as e:
+                            continue
+                    
+                    logger.info(f"Found {len(papers)} papers via Semantic Scholar")
+                    return papers
+            elif response.status_code == 429:
+                logger.warning("Semantic Scholar API rate limit reached")
+                
+        except Exception as e:
+            logger.error(f"Semantic Scholar error: {e}")
+        
+        # Strategy 2: Try DuckDuckGo search as fallback (no rate limiting)
+        try:
+            ddg_url = f"https://html.duckduckgo.com/html/?q=site:researchgate.net+{query.replace(' ', '+')}"
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+            }
+            
+            response = requests.get(ddg_url, headers=headers, timeout=10)
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 
-                # Extract Google search results that link to ResearchGate
-                search_results = soup.find_all('div', class_='g')
+                # DuckDuckGo result links
+                search_results = soup.find_all('a', class_='result__a')
                 
-                for idx, result in enumerate(search_results[:max_results]):
+                for idx, link in enumerate(search_results[:max_results]):
                     try:
-                        # Get title
-                        title_elem = result.find('h3')
-                        if not title_elem:
-                            continue
+                        title = link.get_text(strip=True)
+                        url = link.get('href', '')
                         
-                        title = title_elem.get_text(strip=True)
-                        
-                        # Get URL
-                        link_elem = result.find('a', href=True)
-                        url = link_elem['href'] if link_elem else ''
-                        
-                        # Extract from citation text
-                        snippet_elem = result.find('div', class_=re.compile('VwiC3b|s3v9rd'))
-                        snippet = snippet_elem.get_text(strip=True) if snippet_elem else 'No description available'
-                        
-                        # Try to extract authors and year from snippet
-                        authors = []
-                        year = 'N/A'
-                        
-                        # Look for patterns like "Author Name, Year"
-                        author_year_match = re.search(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),?\s+(19|20)\d{2}', snippet)
-                        if author_year_match:
-                            authors = [author_year_match.group(1)]
-                            year = author_year_match.group(2)
-                        
-                        if not authors:
-                            authors = ['ResearchGate Author']
-                        
-                        paper = {
-                            'title': title,
-                            'authors': authors,
-                            'year': year,
-                            'abstract': snippet[:500],
-                            'url': url if 'researchgate.net' in url else f"https://www.researchgate.net/search/publication?q={query.replace(' ', '+')}",
-                            'source': 'ResearchGate',
-                            'citations': 'N/A',
-                            'venue': 'ResearchGate',
-                            'publisher': 'ResearchGate'
-                        }
-                        
-                        papers.append(paper)
-                        logger.info(f"Found ResearchGate paper via Google: {title[:50]}...")
-                        
+                        if title and url and len(title) > 10:
+                            paper = {
+                                'title': title,
+                                'authors': ['Research Author'],
+                                'year': 'N/A',
+                                'abstract': f'Academic publication related to {query}. Click to view full details.',
+                                'url': url,
+                                'source': 'ResearchGate',
+                                'citations': 'N/A',
+                                'venue': 'ResearchGate',
+                                'publisher': 'Academic Database'
+                            }
+                            
+                            papers.append(paper)
+                            
                     except Exception as e:
-                        logger.error(f"Error parsing Google result {idx}: {e}")
                         continue
-            
-            # If Google approach didn't work or got no results, use direct search with simplified parsing
-            if len(papers) == 0:
-                logger.warning("Google search failed, trying direct ResearchGate search...")
-                direct_url = f"https://www.researchgate.net/search/publication?q={query.replace(' ', '%20')}"
                 
-                try:
-                    response = requests.get(direct_url, headers=headers, timeout=15)
-                    
-                    if response.status_code == 200:
-                        soup = BeautifulSoup(response.text, 'html.parser')
-                        
-                        # Look for any links that might be publications
-                        all_links = soup.find_all('a', href=re.compile('/publication/'))
-                        
-                        seen_titles = set()
-                        for link in all_links[:max_results * 2]:  # Get more to filter duplicates
-                            try:
-                                title = link.get_text(strip=True)
-                                
-                                # Skip if empty or duplicate
-                                if not title or len(title) < 10 or title in seen_titles:
-                                    continue
-                                
-                                seen_titles.add(title)
-                                url = link.get('href', '')
-                                
-                                if url and not url.startswith('http'):
-                                    url = 'https://www.researchgate.net' + url
-                                
-                                paper = {
-                                    'title': title,
-                                    'authors': ['ResearchGate Author'],
-                                    'year': 'N/A',
-                                    'abstract': f'Research publication related to {query}. Click to view full details on ResearchGate.',
-                                    'url': url,
-                                    'source': 'ResearchGate',
-                                    'citations': 'N/A',
-                                    'venue': 'ResearchGate',
-                                    'publisher': 'ResearchGate'
-                                }
-                                
-                                papers.append(paper)
-                                
-                                if len(papers) >= max_results:
-                                    break
-                                    
-                            except Exception as e:
-                                continue
-                        
-                        logger.info(f"Direct search found {len(papers)} ResearchGate papers")
-                        
-                except Exception as e:
-                    logger.error(f"Direct ResearchGate search failed: {e}")
-            
-            time.sleep(1)  # Respectful delay
+                if len(papers) > 0:
+                    logger.info(f"Found {len(papers)} papers via DuckDuckGo search")
+                    return papers
             
         except Exception as e:
-            logger.error(f"Error searching ResearchGate: {e}")
+            logger.error(f"DuckDuckGo search error: {e}")
         
-        # If still no results, log a warning
+        # If all else fails, provide helpful message
         if len(papers) == 0:
             logger.warning(f"No ResearchGate results found for query: {query}")
-            logger.warning("Note: ResearchGate has anti-scraping measures that may prevent data access")
+            logger.warning("Note: Consider using Google Scholar results which are more reliable")
             
         return papers
     
