@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ScholarSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="font-inter">
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="main-container">
+        <header class="page-header glass-card">
+            <a href="/" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Search
+            </a>
+            <h1 class="page-title">
+                <i class="fas fa-envelope"></i> Contact Us
+            </h1>
+        </header>
+
+        <section class="page-content glass-card">
+            <div class="contact-card-page">
+                <div class="contact-image-page">
+                    <img src="{{ url_for('static', filename='images/developer.jpg') }}" alt="Shashi Shekhar" class="developer-photo-page">
+                </div>
+                <div class="contact-info-page">
+                    <h2 class="developer-name-page">Shashi Shekhar</h2>
+                    <p class="developer-title-page"><i class="fab fa-python"></i> Python Developer</p>
+                    
+                    <div class="contact-details-page">
+                        <div class="contact-item-page">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Email</strong>
+                                <a href="mailto:shashishekhar618@gmail.com">shashishekhar618@gmail.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item-page">
+                            <i class="fab fa-linkedin"></i>
+                            <div>
+                                <strong>LinkedIn</strong>
+                                <a href="https://www.linkedin.com/in/shashi-shekhar-18octo/" target="_blank" rel="noopener noreferrer">linkedin.com/in/shashi-shekhar-18octo</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item-page">
+                            <i class="fab fa-github"></i>
+                            <div>
+                                <strong>GitHub</strong>
+                                <a href="https://github.com/Shekhar18oct" target="_blank" rel="noopener noreferrer">github.com/Shekhar18oct</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-message-page">
+                        <h3><i class="fas fa-lightbulb"></i> About the Developer</h3>
+                        <p>Built ScholarSphere as a web-based academic portal that helps students and educators discover curated textbooks, research resources, and academic updates in one place, improving accessibility to essential learning material.</p>
+                        <p>Passionate about creating tools that democratize access to knowledge and empower learners worldwide.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-section">
+                <h3><i class="fas fa-paper-plane"></i> Get in Touch</h3>
+                <p>Have questions, suggestions, or feedback about ScholarSphere? Feel free to reach out through any of the channels above. I'd love to hear from you!</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/" class="footer-link">Home</a>
+                    <a href="/about" class="footer-link">About</a>
+                    <a href="/privacy" class="footer-link">Privacy</a>
+                    <a href="/terms" class="footer-link">Terms</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

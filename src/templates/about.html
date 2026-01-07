@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - ScholarSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="font-inter">
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="main-container">
+        <header class="page-header glass-card">
+            <a href="/" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Search
+            </a>
+            <h1 class="page-title">
+                <i class="fas fa-info-circle"></i> About ScholarSphere
+            </h1>
+        </header>
+
+        <section class="page-content glass-card">
+            <div class="content-section">
+                <h2><i class="fas fa-bullseye"></i> Core Purpose</h2>
+                <p>ScholarSphere – Academic Research Discovery is an AI-assisted web app that helps users find and explore academic research quickly and in a structured way.</p>
+                <p>Acts as a centralized academic portal for students, educators, and researchers to access key resources, insights, and updates in one place.</p>
+                <p>Aims to make academic information more accessible by organizing learning and research content in a user-friendly interface.</p>
+            </div>
+
+            <div class="content-section">
+                <h2><i class="fas fa-rocket"></i> Main Capabilities</h2>
+                <ul>
+                    <li><i class="fas fa-check"></i> Discover academic resources such as textbooks, research papers, and study materials relevant to your courses or interests</li>
+                    <li><i class="fas fa-check"></i> Provides ongoing updates on academic trends, opportunities, and developments to keep learners current in their field</li>
+                    <li><i class="fas fa-check"></i> Search across multiple academic databases including Google Scholar, arXiv, and Wikipedia</li>
+                    <li><i class="fas fa-check"></i> Filter and organize results by source, year, citations, and relevance</li>
+                    <li><i class="fas fa-check"></i> Access research papers from leading academic publishers and repositories</li>
+                </ul>
+            </div>
+
+            <div class="content-section">
+                <h2><i class="fas fa-user-friends"></i> User Experience</h2>
+                <p>Designed as a portal where users can access curated resources tailored to students and educators.</p>
+                <p>Encourages engagement with an academic community, enabling guidance, collaboration, and support throughout the learning journey.</p>
+                <p>Built with a mobile-first, responsive design to ensure accessibility on any device, anywhere.</p>
+            </div>
+
+            <div class="content-section highlight-box">
+                <h3><i class="fas fa-graduation-cap"></i> For Your CV</h3>
+                <p><strong>ScholarSphere – Academic Research Discovery:</strong> Built a web-based academic portal that helps students and educators discover curated textbooks, research resources, and academic updates in one place, improving accessibility to essential learning material.</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/" class="footer-link">Home</a>
+                    <a href="/privacy" class="footer-link">Privacy</a>
+                    <a href="/terms" class="footer-link">Terms</a>
+                    <a href="/contact" class="footer-link">Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
