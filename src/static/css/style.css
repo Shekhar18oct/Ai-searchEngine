@@ -1463,7 +1463,7 @@ input[type="radio"]:checked + .chip,
 .content-section p {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(230, 230, 255, 1);
+    color: rgba(255, 255, 255, 0.95);
     margin-bottom: 1.25rem;
     text-align: justify;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -1478,7 +1478,7 @@ input[type="radio"]:checked + .chip,
 .content-section li {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(240, 240, 255, 1);
+    color: rgba(255, 255, 255, 0.95);
     margin-bottom: 1rem;
     display: flex;
     align-items: flex-start;
@@ -1701,8 +1701,24 @@ input[type="radio"]:checked + .chip,
 
 .contact-item-page strong {
     display: block;
-    color: var(--2rem 1.5rem;
-    }
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.contact-item-page a,
+.contact-item-page p {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.contact-item-page a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
     
     .back-link {
         position: static;
