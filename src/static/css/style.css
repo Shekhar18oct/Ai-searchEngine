@@ -1397,18 +1397,19 @@ input[type="radio"]:checked + .chip,
 
 .content-section {
     margin-bottom: 3rem;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.02);
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(99, 102, 241, 0.2);
     transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .content-section:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(99, 102, 241, 0.4);
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 12px 35px rgba(99, 102, 241, 0.25);
 }
 
 .content-section h2 {
@@ -1463,10 +1464,10 @@ input[type="radio"]:checked + .chip,
 .content-section p {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
     margin-bottom: 1.25rem;
     text-align: justify;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 400;
 }
 
 .content-section ul {
@@ -1478,23 +1479,24 @@ input[type="radio"]:checked + .chip,
 .content-section li {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: #1a202c;
     margin-bottom: 1rem;
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    padding: 1rem;
-    background: rgba(99, 102, 241, 0.12);
-    border-radius: 0.5rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+    border-radius: 0.75rem;
     transition: all 0.3s;
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    border: 2px solid rgba(99, 102, 241, 0.15);
+    font-weight: 500;
 }
 
 .content-section li:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
     transform: translateX(10px);
-    box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
-    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.4);
 }
 
 .content-section li i {
