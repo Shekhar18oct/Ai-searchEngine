@@ -54,25 +54,34 @@ class ResearchPaperSearcher:
                 executor.submit(self._safe_search_wikipedia, query, max_results): 'wikipedia'
             }
             
-            # Collect results as they complete
-            for future in as_completed(future_to_source, timeout=60):
-                source = future_to_source[future]
-                try:
-                    data = future.result(timeout=30)  # 30 second timeout per source
-                    results[source] = data
-                    logger.info(f"✓ {source.capitalize()} completed: {len(data)} results")
-                except Exception as e:
-                    logger.error(f"✗ {source.capitalize()} failed: {e}")
-                    results[source] = []
+            # Collect results as they complete (increased timeout)
+            try:
+                for future in as_completed(future_to_source, timeout=120):  # 2 minutes total
+                    source = future_to_source[future]
+                    try:
+                        data = future.result(timeout=90)  # 90 seconds per source for Scholar
+                        results[source] = data
+                        logger.info(f"✓ {source.capitalize()} completed: {len(data)} results")
+                    except TimeoutError:
+                        logger.error(f"✗ {source.capitalize()} timed out after 90 seconds")
+                        results[source] = []
+                    except Exception as e:
+                        logger.error(f"✗ {source.capitalize()} failed: {str(e)}")
+                        results[source] = []
+            except TimeoutError:
+                logger.error("Overall search timed out after 120 seconds")
         
         return results
     
     def _safe_search_google_scholar(self, query: str, max_results: int) -> List[Dict[str, Any]]:
         """Wrapper for Google Scholar search with error handling"""
         try:
-            return self.search_google_scholar(query, max_results)
+            logger.info(f"Starting Google Scholar search for: {query}")
+            results = self.search_google_scholar(query, max_results)
+            logger.info(f"Google Scholar search completed: {len(results)} results")
+            return results
         except Exception as e:
-            logger.error(f"Google Scholar error: {e}")
+            logger.error(f"Google Scholar error: {str(e)}", exc_info=True)
             return []
     
     def _safe_search_researchgate(self, query: str, max_results: int) -> List[Dict[str, Any]]:
