@@ -1573,11 +1573,19 @@ input[type="radio"]:checked + .chip,
     align-items: flex-start;
     margin-bottom: 3rem;
     padding: 2.5rem;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(99, 102, 241, 0.2);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+    transition: all 0.3s;
+}
+
+.contact-card-page:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.4);
 }
 
 .contact-card-page::before {
@@ -1669,15 +1677,15 @@ input[type="radio"]:checked + .chip,
     align-items: flex-start;
     gap: 1.25rem;
     margin-bottom: 1.5rem;
-    padding: 1.25rem;
-    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
     border-radius: 0.75rem;
     border-left: 4px solid var(--primary-color);
     transition: all 0.3s ease;
 }
 
 .contact-item-page:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
     transform: translateX(10px);
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     border-left-width: 6px;
@@ -1703,18 +1711,19 @@ input[type="radio"]:checked + .chip,
 
 .contact-item-page strong {
     display: block;
-    color: rgba(255, 255, 255, 0.95);
+    color: #1a202c;
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
 .contact-item-page a,
 .contact-item-page p {
-    color: rgba(255, 255, 255, 0.9);
+    color: #2d3748;
     text-decoration: none;
     font-size: 1.1rem;
     transition: color 0.3s;
+    font-weight: 500;
 }
 
 .contact-item-page a:hover {
@@ -1951,22 +1960,45 @@ input[type="radio"]:checked + .chip,
     margin-bottom: 1rem;
     line-height: 1.8;
     font-size: 1.05rem;
-    color: rgba(230, 230, 255, 1);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: #2d3748;
+    font-weight: 400;
 }
 
 .contact-form-section {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+    background: rgba(255, 255, 255, 0.95);
     padding: 2.5rem;
     border-radius: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
     transition: all 0.3s;
 }
 
 .contact-form-section:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.contact-form-section h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.contact-form-section h3 i {
+    color: var(--accent-color);
+    animation: iconGlow 2s ease-in-out infinite;
+}
+
+.contact-form-section p {
+    color: #2d3748;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    font-weight: 400;
 }
 
 .contact-form-section h3 {
