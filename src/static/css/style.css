@@ -1442,8 +1442,11 @@ input[type="radio"]:checked + .chip,
 
 .content-section h3 {
     font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary-color);
+    font-weight: 700;
+    background: linear-gradient(135deg, #8b8bff, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 1rem;
     margin-top: 1.5rem;
     display: flex;
@@ -1452,15 +1455,18 @@ input[type="radio"]:checked + .chip,
 }
 
 .content-section h3 i {
-    color: var(--secondary-color);
+    color: var(--accent-color);
+    -webkit-text-fill-color: var(--accent-color);
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.5));
 }
 
 .content-section p {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(230, 230, 255, 1);
     margin-bottom: 1.25rem;
     text-align: justify;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .content-section ul {
@@ -1472,29 +1478,32 @@ input[type="radio"]:checked + .chip,
 .content-section li {
     font-size: 1.1rem;
     line-height: 1.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(240, 240, 255, 1);
     margin-bottom: 1rem;
     display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(99, 102, 241, 0.05);
+    background: rgba(99, 102, 241, 0.12);
     border-radius: 0.5rem;
     transition: all 0.3s;
+    border: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .content-section li:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(99, 102, 241, 0.2);
     transform: translateX(10px);
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+    border-color: rgba(168, 85, 247, 0.5);
 }
 
 .content-section li i {
-    color: var(--primary-color);
+    color: var(--accent-color);
     font-size: 1.3rem;
     margin-top: 0.2rem;
     flex-shrink: 0;
     animation: iconBounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.5));
 }
 
 @keyframes iconBounce {
@@ -1518,23 +1527,24 @@ input[type="radio"]:checked + .chip,
 
 .last-updated {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(245, 158, 11, 0.9);
     font-style: italic;
     margin-bottom: 2rem;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(245, 158, 11, 0.08);
     border-radius: 0.5rem;
     border-left: 3px solid var(--accent-color);
 }
 
 .highlight-box {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
     border-left: 5px solid var(--primary-color);
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 .highlight-box::before {
@@ -1831,6 +1841,8 @@ input[type="radio"]:checked + .chip,
     margin-bottom: 1rem;
     line-height: 1.8;
     font-size: 1.05rem;
+    color: rgba(230, 230, 255, 1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .contact-form-section {
@@ -1863,7 +1875,8 @@ input[type="radio"]:checked + .chip,
 .contact-form-section p {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(230, 230, 255, 1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Page Responsive */
