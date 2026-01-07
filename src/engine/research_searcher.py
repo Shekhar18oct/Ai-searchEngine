@@ -12,6 +12,8 @@ from fake_useragent import UserAgent
 import wikipedia
 from scholarly import scholarly
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,7 +30,7 @@ class ResearchPaperSearcher:
         
     def search_all(self, query: str, max_results: int = 10) -> Dict[str, List[Dict[str, Any]]]:
         """
-        Search all sources for research papers
+        Search all sources for research papers in PARALLEL for faster results
         
         Args:
             query: Search query
@@ -38,15 +40,60 @@ class ResearchPaperSearcher:
             Dictionary containing results from all sources
         """
         results = {
-            'scholar': self.search_google_scholar(query, max_results),
-            'researchgate': self.search_researchgate(query, max_results),
-            'wikipedia': self.search_wikipedia(query, max_results)
+            'scholar': [],
+            'researchgate': [],
+            'wikipedia': []
         }
+        
+        # Use ThreadPoolExecutor for parallel searching
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            # Submit all searches simultaneously
+            future_to_source = {
+                executor.submit(self._safe_search_google_scholar, query, max_results): 'scholar',
+                executor.submit(self._safe_search_researchgate, query, max_results): 'researchgate',
+                executor.submit(self._safe_search_wikipedia, query, max_results): 'wikipedia'
+            }
+            
+            # Collect results as they complete
+            for future in as_completed(future_to_source, timeout=60):
+                source = future_to_source[future]
+                try:
+                    data = future.result(timeout=30)  # 30 second timeout per source
+                    results[source] = data
+                    logger.info(f"✓ {source.capitalize()} completed: {len(data)} results")
+                except Exception as e:
+                    logger.error(f"✗ {source.capitalize()} failed: {e}")
+                    results[source] = []
+        
         return results
+    
+    def _safe_search_google_scholar(self, query: str, max_results: int) -> List[Dict[str, Any]]:
+        """Wrapper for Google Scholar search with error handling"""
+        try:
+            return self.search_google_scholar(query, max_results)
+        except Exception as e:
+            logger.error(f"Google Scholar error: {e}")
+            return []
+    
+    def _safe_search_researchgate(self, query: str, max_results: int) -> List[Dict[str, Any]]:
+        """Wrapper for ResearchGate search with error handling"""
+        try:
+            return self.search_researchgate(query, max_results)
+        except Exception as e:
+            logger.error(f"ResearchGate error: {e}")
+            return []
+    
+    def _safe_search_wikipedia(self, query: str, max_results: int) -> List[Dict[str, Any]]:
+        """Wrapper for Wikipedia search with error handling"""
+        try:
+            return self.search_wikipedia(query, max_results)
+        except Exception as e:
+            logger.error(f"Wikipedia error: {e}")
+            return []
     
     def search_google_scholar(self, query: str, max_results: int = 10) -> List[Dict[str, Any]]:
         """
-        Search Google Scholar for research papers
+        Search Google Scholar for research papers (OPTIMIZED)
         
         Args:
             query: Search query
@@ -56,12 +103,20 @@ class ResearchPaperSearcher:
             List of paper dictionaries
         """
         papers = []
+        
+        # Limit max_results to prevent very slow searches
+        max_results = min(max_results, 20)  # Cap at 20 for speed
+        
         try:
             search_query = scholarly.search_pubs(query)
             
             for i, result in enumerate(search_query):
                 if i >= max_results:
                     break
+                
+                # Quick timeout if taking too long
+                if i > 0 and i % 5 == 0:
+                    logger.info(f"Scholar: Retrieved {i} papers so far...")
                     
                 try:
                     paper = {
@@ -79,8 +134,9 @@ class ResearchPaperSearcher:
                 except Exception as e:
                     logger.error(f"Error parsing scholar result: {e}")
                     continue
-                    
-            time.sleep(0.5)  # Respectful delay
+            
+            # Reduced delay for faster response
+            time.sleep(0.2)
             
         except Exception as e:
             logger.error(f"Error searching Google Scholar: {e}")
