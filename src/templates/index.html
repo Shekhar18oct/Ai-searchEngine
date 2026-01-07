@@ -224,14 +224,209 @@
                 </div>
                 <p class="footer-text">Empowering researchers worldwide with comprehensive academic search</p>
                 <div class="footer-links">
-                    <a href="#" class="footer-link">About</a>
-                    <a href="#" class="footer-link">Privacy</a>
-                    <a href="#" class="footer-link">Terms</a>
-                    <a href="#" class="footer-link">Contact</a>
+                    <a href="#about" class="footer-link" onclick="openModal('aboutModal')">About</a>
+                    <a href="#privacy" class="footer-link" onclick="openModal('privacyModal')">Privacy</a>
+                    <a href="#terms" class="footer-link" onclick="openModal('termsModal')">Terms</a>
+                    <a href="#contact" class="footer-link" onclick="openModal('contactModal')">Contact</a>
                 </div>
             </div>
         </footer>
 
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close" onclick="closeModal('aboutModal')">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-info-circle"></i> About ScholarSphere</h2>
+            
+            <div class="modal-body">
+                <h3><i class="fas fa-bullseye"></i> Core Purpose</h3>
+                <p>ScholarSphere – Academic Research Discovery is an AI-assisted web app that helps users find and explore academic research quickly and in a structured way.</p>
+                <p>Acts as a centralized academic portal for students, educators, and researchers to access key resources, insights, and updates in one place.</p>
+                <p>Aims to make academic information more accessible by organizing learning and research content in a user-friendly interface.</p>
+                
+                <h3><i class="fas fa-rocket"></i> Main Capabilities</h3>
+                <ul>
+                    <li>Discover academic resources such as textbooks, research papers, and study materials relevant to your courses or interests</li>
+                    <li>Provides ongoing updates on academic trends, opportunities, and developments to keep learners current in their field</li>
+                    <li>Search across multiple academic databases including Google Scholar, arXiv, and Wikipedia</li>
+                    <li>Filter and organize results by source, year, citations, and relevance</li>
+                </ul>
+                
+                <h3><i class="fas fa-user-friends"></i> User Experience</h3>
+                <p>Designed as a portal where users can access curated resources tailored to students and educators.</p>
+                <p>Encourages engagement with an academic community, enabling guidance, collaboration, and support throughout the learning journey.</p>
+                <p>Built with a mobile-first, responsive design to ensure accessibility on any device, anywhere.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close" onclick="closeModal('privacyModal')">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-shield-alt"></i> Privacy Policy</h2>
+            
+            <div class="modal-body">
+                <p><strong>Last Updated:</strong> January 7, 2026</p>
+                
+                <h3>1. Introduction</h3>
+                <p>ScholarSphere ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information in accordance with the General Data Protection Regulation (GDPR) and other applicable data protection laws.</p>
+                
+                <h3>2. Data We Collect</h3>
+                <ul>
+                    <li><strong>Search Queries:</strong> We temporarily process your search queries to provide research results</li>
+                    <li><strong>Usage Data:</strong> We may collect anonymous usage statistics to improve our service</li>
+                    <li><strong>Technical Data:</strong> IP addresses, browser type, and device information for security and optimization</li>
+                </ul>
+                
+                <h3>3. Legal Basis for Processing (GDPR)</h3>
+                <p>We process your data based on:</p>
+                <ul>
+                    <li><strong>Legitimate Interest:</strong> To provide and improve our academic search services</li>
+                    <li><strong>Consent:</strong> Where you have given explicit consent for specific data processing</li>
+                </ul>
+                
+                <h3>4. Your GDPR Rights</h3>
+                <p>Under GDPR, you have the right to:</p>
+                <ul>
+                    <li><strong>Access:</strong> Request copies of your personal data</li>
+                    <li><strong>Rectification:</strong> Request correction of inaccurate data</li>
+                    <li><strong>Erasure:</strong> Request deletion of your data ("right to be forgotten")</li>
+                    <li><strong>Restriction:</strong> Request limitation of data processing</li>
+                    <li><strong>Data Portability:</strong> Receive your data in a structured format</li>
+                    <li><strong>Object:</strong> Object to processing of your data</li>
+                </ul>
+                
+                <h3>5. Data Retention</h3>
+                <p>Search queries are not stored permanently. Usage data is retained for a maximum of 12 months for analytical purposes only.</p>
+                
+                <h3>6. Third-Party Services</h3>
+                <p>We use third-party academic databases (Google Scholar, arXiv, Wikipedia) to provide search results. These services have their own privacy policies.</p>
+                
+                <h3>7. Data Security</h3>
+                <p>We implement industry-standard security measures to protect your data from unauthorized access, alteration, or destruction.</p>
+                
+                <h3>8. International Data Transfers</h3>
+                <p>Data may be processed in servers located outside the EU. We ensure appropriate safeguards are in place for such transfers.</p>
+                
+                <h3>9. Contact for Privacy Concerns</h3>
+                <p>For any privacy-related questions or to exercise your GDPR rights, contact us at: <a href="mailto:shashishekhar618@gmail.com">shashishekhar618@gmail.com</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close" onclick="closeModal('termsModal')">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-file-contract"></i> Terms of Service</h2>
+            
+            <div class="modal-body">
+                <p><strong>Last Updated:</strong> January 7, 2026</p>
+                
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing and using ScholarSphere, you accept and agree to be bound by these Terms of Service. If you do not agree, please do not use our service.</p>
+                
+                <h3>2. Service Description</h3>
+                <p>ScholarSphere is an academic research discovery platform that aggregates search results from multiple academic databases including Google Scholar, arXiv, and Wikipedia. We provide a search interface but do not host the actual research papers.</p>
+                
+                <h3>3. User Responsibilities</h3>
+                <ul>
+                    <li><strong>Academic Use:</strong> This service is intended for educational and research purposes only</li>
+                    <li><strong>Lawful Use:</strong> You agree to use ScholarSphere in compliance with all applicable laws and regulations</li>
+                    <li><strong>No Automated Abuse:</strong> You may not use bots, scrapers, or automated tools to excessively query our service</li>
+                    <li><strong>Attribution:</strong> When using research found through our platform, properly cite original sources</li>
+                </ul>
+                
+                <h3>4. Intellectual Property</h3>
+                <ul>
+                    <li>ScholarSphere's interface, design, and code are protected by copyright</li>
+                    <li>Research papers and content are owned by their respective publishers and authors</li>
+                    <li>Third-party database content is subject to their respective terms of service</li>
+                </ul>
+                
+                <h3>5. Disclaimer of Warranties</h3>
+                <p>ScholarSphere is provided "AS IS" without warranties of any kind, either express or implied, including but not limited to:</p>
+                <ul>
+                    <li>Accuracy, completeness, or reliability of search results</li>
+                    <li>Availability or uninterrupted access to the service</li>
+                    <li>Fitness for a particular purpose</li>
+                </ul>
+                
+                <h3>6. Limitation of Liability</h3>
+                <p>To the maximum extent permitted by law, ScholarSphere and its developers shall not be liable for any indirect, incidental, special, or consequential damages arising from:</p>
+                <ul>
+                    <li>Use or inability to use the service</li>
+                    <li>Reliance on search results or linked content</li>
+                    <li>Service interruptions or data loss</li>
+                </ul>
+                
+                <h3>7. Third-Party Content</h3>
+                <p>We aggregate results from external academic databases. We are not responsible for:</p>
+                <ul>
+                    <li>Accuracy, quality, or legality of third-party content</li>
+                    <li>Availability of external links or resources</li>
+                    <li>Privacy practices of third-party websites</li>
+                </ul>
+                
+                <h3>8. Service Modifications</h3>
+                <p>We reserve the right to modify, suspend, or discontinue any aspect of ScholarSphere at any time without prior notice.</p>
+                
+                <h3>9. Termination</h3>
+                <p>We may terminate or restrict your access to ScholarSphere for violation of these terms or for any other reason at our discretion.</p>
+                
+                <h3>10. Governing Law</h3>
+                <p>These terms are governed by applicable laws. Any disputes shall be resolved through appropriate legal channels.</p>
+                
+                <h3>11. Changes to Terms</h3>
+                <p>We may update these Terms of Service periodically. Continued use of the service constitutes acceptance of updated terms.</p>
+                
+                <h3>12. Contact</h3>
+                <p>For questions about these terms, contact: <a href="mailto:shashishekhar618@gmail.com">shashishekhar618@gmail.com</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close" onclick="closeModal('contactModal')">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-envelope"></i> Contact Us</h2>
+            
+            <div class="modal-body">
+                <div class="contact-card">
+                    <div class="contact-image">
+                        <img src="{{ url_for('static', filename='images/developer.jpg') }}" alt="Shashi Shekhar" class="developer-photo">
+                    </div>
+                    <div class="contact-info">
+                        <h3 class="developer-name">Shashi Shekhar</h3>
+                        <p class="developer-title"><i class="fab fa-python"></i> Python Developer</p>
+                        
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:shashishekhar618@gmail.com">shashishekhar618@gmail.com</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-linkedin"></i>
+                                <a href="https://www.linkedin.com/in/shashi-shekhar-18octo/" target="_blank" rel="noopener noreferrer">linkedin.com/in/shashi-shekhar-18octo</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-github"></i>
+                                <a href="https://github.com/Shekhar18oct" target="_blank" rel="noopener noreferrer">github.com/Shekhar18oct</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-message">
+                            <p><i class="fas fa-lightbulb"></i> <strong>About the Developer:</strong></p>
+                            <p>Built ScholarSphere as a web-based academic portal that helps students and educators discover curated textbooks, research resources, and academic updates in one place, improving accessibility to essential learning material.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
