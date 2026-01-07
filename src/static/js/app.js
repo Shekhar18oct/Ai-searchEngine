@@ -354,3 +354,48 @@ setTimeout(() => {
         observer.observe(card);
     });
 }, 100);
+
+/**
+ * Filter search by source from badge buttons
+ */
+function filterBySource(source) {
+    // Select the appropriate radio button
+    const sourceRadio = document.getElementById(`source-${source}`);
+    if (sourceRadio) {
+        sourceRadio.checked = true;
+        
+        // Update chip visual state
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.classList.remove('chip-active');
+        });
+        document.querySelector(`label[for="source-${source}"]`).classList.add('chip-active');
+        
+        // Add visual feedback to badge
+        document.querySelectorAll('.clickable-badge').forEach(badge => {
+            badge.style.transform = 'scale(1)';
+            badge.style.opacity = '0.8';
+        });
+        
+        const clickedBadge = event.target.closest('.clickable-badge');
+        if (clickedBadge) {
+            clickedBadge.style.transform = 'scale(1.05)';
+            clickedBadge.style.opacity = '1';
+            
+            setTimeout(() => {
+                clickedBadge.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        // Scroll to search section
+        document.querySelector('.search-section').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        // Focus on search input
+        setTimeout(() => {
+            document.getElementById('researchQuery').focus();
+        }, 500);
+    }
+}
+
