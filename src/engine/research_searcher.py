@@ -98,114 +98,144 @@ class ResearchPaperSearcher:
             List of paper dictionaries
         """
         papers = []
+        
+        # IMPORTANT: ResearchGate has strong anti-scraping measures
+        # This implementation provides a fallback approach
+        
         try:
-            # Use more robust search approach
-            search_url = f"https://www.researchgate.net/search/publication?q={query.replace(' ', '%20')}"
+            # Attempt to use Google search with site:researchgate.net
+            google_search_url = f"https://www.google.com/search?q=site:researchgate.net+{query.replace(' ', '+')}"
             
-            # Rotate user agents to avoid blocking
             headers = {
-                'User-Agent': self.ua.random,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate, br',
+                'Referer': 'https://www.google.com/',
                 'DNT': '1',
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1'
             }
             
-            response = requests.get(search_url, headers=headers, timeout=15)
+            response = requests.get(google_search_url, headers=headers, timeout=10)
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 
-                # Multiple selector strategies
-                results = []
+                # Extract Google search results that link to ResearchGate
+                search_results = soup.find_all('div', class_='g')
                 
-                # Strategy 1: Look for article/research items
-                results = soup.find_all('div', {'data-testid': re.compile('publication|research')})
-                
-                if not results:
-                    # Strategy 2: Search result items
-                    results = soup.find_all('div', class_=re.compile('search-box__result-item|research-item'))
-                
-                if not results:
-                    # Strategy 3: Generic containers with links
-                    results = soup.find_all('div', class_=re.compile('nova-legacy-o-stack__item'))
-                
-                logger.info(f"Found {len(results)} ResearchGate results")
-                
-                for idx, result in enumerate(results[:max_results]):
+                for idx, result in enumerate(search_results[:max_results]):
                     try:
-                        # Find title with multiple strategies
-                        title_elem = (result.find('a', class_=re.compile('nova-legacy-e-link.*nova-legacy-e-link--theme-bare')) or
-                                    result.find('a', href=re.compile('/publication/')) or
-                                    result.find('h3') or
-                                    result.find('div', class_=re.compile('nova-legacy-e-text.*nova-legacy-e-text--size-l')))
-                        
+                        # Get title
+                        title_elem = result.find('h3')
                         if not title_elem:
                             continue
-                            
-                        title = title_elem.get_text(strip=True) if title_elem else f"Research Paper {idx+1}"
-                        url = ''
                         
-                        if title_elem.name == 'a':
-                            url = title_elem.get('href', '')
-                        elif title_elem.find_parent('a'):
-                            url = title_elem.find_parent('a').get('href', '')
+                        title = title_elem.get_text(strip=True)
                         
-                        if url and not url.startswith('http'):
-                            url = 'https://www.researchgate.net' + url
+                        # Get URL
+                        link_elem = result.find('a', href=True)
+                        url = link_elem['href'] if link_elem else ''
                         
-                        # Extract authors
+                        # Extract from citation text
+                        snippet_elem = result.find('div', class_=re.compile('VwiC3b|s3v9rd'))
+                        snippet = snippet_elem.get_text(strip=True) if snippet_elem else 'No description available'
+                        
+                        # Try to extract authors and year from snippet
                         authors = []
-                        author_links = result.find_all('a', href=re.compile('/profile/'))
-                        if author_links:
-                            authors = [a.get_text(strip=True) for a in author_links[:5]]
+                        year = 'N/A'
+                        
+                        # Look for patterns like "Author Name, Year"
+                        author_year_match = re.search(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),?\s+(19|20)\d{2}', snippet)
+                        if author_year_match:
+                            authors = [author_year_match.group(1)]
+                            year = author_year_match.group(2)
                         
                         if not authors:
-                            # Fallback: look for author text
-                            author_elem = result.find('div', class_=re.compile('nova-legacy-v-person-list-item'))
-                            if author_elem:
-                                authors = [author_elem.get_text(strip=True)]
+                            authors = ['ResearchGate Author']
                         
-                        # Extract year
-                        year = 'N/A'
-                        date_text = result.get_text()
-                        year_match = re.search(r'\b(19|20)\d{2}\b', date_text)
-                        if year_match:
-                            year = year_match.group(0)
+                        paper = {
+                            'title': title,
+                            'authors': authors,
+                            'year': year,
+                            'abstract': snippet[:500],
+                            'url': url if 'researchgate.net' in url else f"https://www.researchgate.net/search/publication?q={query.replace(' ', '+')}",
+                            'source': 'ResearchGate',
+                            'citations': 'N/A',
+                            'venue': 'ResearchGate',
+                            'publisher': 'ResearchGate'
+                        }
                         
-                        # Extract abstract/snippet
-                        abstract = 'No abstract available'
-                        abstract_elem = (result.find('div', class_=re.compile('nova-legacy-e-text.*nova-legacy-e-text--color-grey-700')) or
-                                       result.find('div', class_=re.compile('publication-preview|research-snippet')))
-                        if abstract_elem:
-                            abstract = abstract_elem.get_text(strip=True)[:500]
-                        
-                        # Only add if we have a valid title
-                        if title and len(title) > 3:
-                            paper = {
-                                'title': title,
-                                'authors': authors if authors else ['Unknown'],
-                                'year': year,
-                                'abstract': abstract,
-                                'url': url if url else f"https://www.researchgate.net/search/publication?q={query.replace(' ', '+')}",
-                                'source': 'ResearchGate',
-                                'citations': 'N/A',
-                                'venue': 'N/A',
-                                'publisher': 'ResearchGate'
-                            }
-                            papers.append(paper)
-                            logger.info(f"Successfully parsed ResearchGate paper: {title[:50]}...")
+                        papers.append(paper)
+                        logger.info(f"Found ResearchGate paper via Google: {title[:50]}...")
                         
                     except Exception as e:
-                        logger.error(f"Error parsing ResearchGate result {idx}: {e}")
+                        logger.error(f"Error parsing Google result {idx}: {e}")
                         continue
+            
+            # If Google approach didn't work or got no results, use direct search with simplified parsing
+            if len(papers) == 0:
+                logger.warning("Google search failed, trying direct ResearchGate search...")
+                direct_url = f"https://www.researchgate.net/search/publication?q={query.replace(' ', '%20')}"
+                
+                try:
+                    response = requests.get(direct_url, headers=headers, timeout=15)
+                    
+                    if response.status_code == 200:
+                        soup = BeautifulSoup(response.text, 'html.parser')
                         
+                        # Look for any links that might be publications
+                        all_links = soup.find_all('a', href=re.compile('/publication/'))
+                        
+                        seen_titles = set()
+                        for link in all_links[:max_results * 2]:  # Get more to filter duplicates
+                            try:
+                                title = link.get_text(strip=True)
+                                
+                                # Skip if empty or duplicate
+                                if not title or len(title) < 10 or title in seen_titles:
+                                    continue
+                                
+                                seen_titles.add(title)
+                                url = link.get('href', '')
+                                
+                                if url and not url.startswith('http'):
+                                    url = 'https://www.researchgate.net' + url
+                                
+                                paper = {
+                                    'title': title,
+                                    'authors': ['ResearchGate Author'],
+                                    'year': 'N/A',
+                                    'abstract': f'Research publication related to {query}. Click to view full details on ResearchGate.',
+                                    'url': url,
+                                    'source': 'ResearchGate',
+                                    'citations': 'N/A',
+                                    'venue': 'ResearchGate',
+                                    'publisher': 'ResearchGate'
+                                }
+                                
+                                papers.append(paper)
+                                
+                                if len(papers) >= max_results:
+                                    break
+                                    
+                            except Exception as e:
+                                continue
+                        
+                        logger.info(f"Direct search found {len(papers)} ResearchGate papers")
+                        
+                except Exception as e:
+                    logger.error(f"Direct ResearchGate search failed: {e}")
+            
             time.sleep(1)  # Respectful delay
             
         except Exception as e:
             logger.error(f"Error searching ResearchGate: {e}")
+        
+        # If still no results, log a warning
+        if len(papers) == 0:
+            logger.warning(f"No ResearchGate results found for query: {query}")
+            logger.warning("Note: ResearchGate has anti-scraping measures that may prevent data access")
             
         return papers
     
