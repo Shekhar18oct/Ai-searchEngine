@@ -76,13 +76,16 @@ class ResearchPaperSearcher:
     def _safe_search_google_scholar(self, query: str, max_results: int) -> List[Dict[str, Any]]:
         """Wrapper for Google Scholar search with error handling"""
         try:
-            logger.info(f"Starting Google Scholar search for: {query}")
+            logger.info(f"Starting Google Scholar search for: {query} (max: {max_results})")
+            start_time = time.time()
             results = self.search_google_scholar(query, max_results)
-            logger.info(f"Google Scholar search completed: {len(results)} results")
+            elapsed = time.time() - start_time
+            logger.info(f"Google Scholar search completed: {len(results)} results in {elapsed:.2f}s")
             return results
         except Exception as e:
             logger.error(f"Google Scholar error: {str(e)}", exc_info=True)
-            return []
+            logger.warning("Attempting Semantic Scholar fallback...")
+            return self._fallback_semantic_scholar(query, max_results)
     
     def _safe_search_researchgate(self, query: str, max_results: int) -> List[Dict[str, Any]]:
         """Wrapper for ResearchGate search with error handling"""
@@ -102,7 +105,7 @@ class ResearchPaperSearcher:
     
     def search_google_scholar(self, query: str, max_results: int = 10) -> List[Dict[str, Any]]:
         """
-        Search Google Scholar for research papers (OPTIMIZED)
+        Search Google Scholar for research papers (OPTIMIZED with fallback)
         
         Args:
             query: Search query
@@ -117,6 +120,9 @@ class ResearchPaperSearcher:
         max_results = min(max_results, 20)  # Cap at 20 for speed
         
         try:
+            # Add random delay to avoid detection
+            time.sleep(0.5)
+            
             search_query = scholarly.search_pubs(query)
             
             for i, result in enumerate(search_query):
@@ -148,7 +154,113 @@ class ResearchPaperSearcher:
             time.sleep(0.2)
             
         except Exception as e:
-            logger.error(f"Error searching Google Scholar: {e}")
+            logger.error(f"Error searching Google Scholar (might be blocked in production): {e}")
+            # Try fallback to Semantic Scholar API
+            logger.info("Attempting fallback to Semantic Scholar API...")
+            return self._fallback_semantic_scholar(query, max_results)
+            
+        return papers
+    
+    def _fallback_semantic_scholar(self, query: str, max_results: int = 10) -> List[Dict[str, Any]]:
+        """Fallback to CrossRef and Semantic Scholar APIs when Google Scholar is blocked"""
+        papers = []
+        
+        # Try CrossRef first (more reliable, no rate limits with polite headers)
+        try:
+            logger.info("Trying CrossRef API...")
+            crossref_url = "https://api.crossref.org/works"
+            params = {
+                'query': query,
+                'rows': min(max_results, 20),
+                'select': 'title,author,published-print,abstract,URL,publisher,container-title,is-referenced-by-count'
+            }
+            headers = {
+                'User-Agent': 'ScholarSphere/1.0 (mailto:research@scholarsphere.com)'  # Polite pool
+            }
+            
+            response = requests.get(crossref_url, params=params, headers=headers, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                items = data.get('message', {}).get('items', [])
+                
+                for item in items[:max_results]:
+                    # Extract authors
+                    authors = []
+                    if 'author' in item:
+                        authors = [f"{a.get('given', '')} {a.get('family', '')}".strip() 
+                                 for a in item['author'][:5]]
+                    
+                    # Extract year
+                    year = 'N/A'
+                    if 'published-print' in item:
+                        date_parts = item['published-print'].get('date-parts', [[]])[0]
+                        if date_parts:
+                            year = str(date_parts[0])
+                    
+                    # Extract title (can be array)
+                    title = 'N/A'
+                    if 'title' in item and item['title']:
+                        title = item['title'][0] if isinstance(item['title'], list) else item['title']
+                    
+                    paper = {
+                        'title': title,
+                        'authors': authors if authors else ['Unknown'],
+                        'year': year,
+                        'abstract': item.get('abstract', 'No abstract available')[:500],
+                        'citations': item.get('is-referenced-by-count', 0),
+                        'url': item.get('URL', ''),
+                        'source': 'Google Scholar',  # Keep as Scholar for UI
+                        'venue': item.get('container-title', ['N/A'])[0] if isinstance(item.get('container-title'), list) else item.get('container-title', 'N/A'),
+                        'publisher': item.get('publisher', 'CrossRef')
+                    }
+                    papers.append(paper)
+                
+                if papers:
+                    logger.info(f"CrossRef API: Found {len(papers)} papers")
+                    return papers
+            else:
+                logger.warning(f"CrossRef returned status {response.status_code}")
+                
+        except Exception as e:
+            logger.error(f"CrossRef API error: {e}")
+        
+        # Fallback to Semantic Scholar if CrossRef fails
+        try:
+            logger.info("Trying Semantic Scholar API...")
+            semantic_url = "https://api.semanticscholar.org/graph/v1/paper/search"
+            params = {
+                'query': query,
+                'limit': min(max_results, 20),
+                'fields': 'title,authors,year,abstract,citationCount,url,venue,publicationTypes'
+            }
+            
+            response = requests.get(semantic_url, params=params, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                for item in data.get('data', [])[:max_results]:
+                    authors = [author.get('name', 'Unknown') for author in item.get('authors', [])]
+                    
+                    paper = {
+                        'title': item.get('title', 'N/A'),
+                        'authors': authors if authors else ['Unknown'],
+                        'year': str(item.get('year', 'N/A')),
+                        'abstract': item.get('abstract', 'No abstract available'),
+                        'citations': item.get('citationCount', 0),
+                        'url': item.get('url', ''),
+                        'source': 'Google Scholar',  # Keep as Scholar for UI
+                        'venue': item.get('venue', 'N/A'),
+                        'publisher': 'Semantic Scholar API'
+                    }
+                    papers.append(paper)
+                
+                logger.info(f"Semantic Scholar: Found {len(papers)} papers")
+            else:
+                logger.error(f"Semantic Scholar API returned status {response.status_code}")
+                
+        except Exception as e:
+            logger.error(f"Semantic Scholar fallback failed: {e}")
             
         return papers
     
